@@ -1,0 +1,83 @@
+import pygame
+import sys
+
+# Pygame başlatma
+pygame.init()
+
+# Ekran boyutları
+WIDTH, HEIGHT = 800, 600
+screen = pygame.display.set_mode((WIDTH, HEIGHT))
+pygame.display.set_caption("Basit Platform Oyunu")
+
+# Renkler
+WHITE = (255, 255, 255)
+BLUE = (0, 0, 255)
+GREEN = (0, 255, 0)
+BLACK = (0, 0, 0)
+
+# Oyuncu ayarları
+player_width, player_height = 50, 50
+player_x, player_y = 50, HEIGHT - player_height - 50
+player_velocity_y = 0
+gravity = 1
+jump_strength = -15
+on_ground = False
+
+# Platform ayarları
+platform_width, platform_height = 200, 20
+platform_x, platform_y = 300, HEIGHT - 100
+
+# Ana oyun döngüsü
+clock = pygame.time.Clock()
+running = True
+
+while running:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
+
+    # Tuş kontrolleri
+    keys = pygame.key.get_pressed()
+    if keys[pygame.K_LEFT]:
+        player_x -= 5
+    if keys[pygame.K_RIGHT]:
+        player_x += 5
+    if keys[pygame.K_SPACE] and on_ground:
+        player_velocity_y = jump_strength
+        on_ground = False
+
+    # Yerçekimi
+    player_velocity_y += gravity
+    player_y += player_velocity_y
+
+    # Platform üzerinde durma kontrolü
+    if (player_y + player_height >= platform_y and
+        player_x + player_width >= platform_x and
+        player_x <= platform_x + platform_width):
+        player_y = platform_y - player_height
+        player_velocity_y = 0
+        on_ground = True
+
+    # Zemin üzerinde durma kontrolü
+    if player_y + player_height >= HEIGHT - 50:
+        player_y = HEIGHT - player_height - 50
+        player_velocity_y = 0
+        on_ground = True
+
+    # Ekranı temizleme
+    screen.fill(WHITE)
+
+    # Platform çizimi
+    pygame.draw.rect(screen, GREEN, (platform_x, platform_y, platform_width, platform_height))
+
+    # Oyuncu çizimi
+    pygame.draw.rect(screen, BLUE, (player_x, player_y, player_width, player_height))
+
+    # Ekranı güncelleme
+    pygame.display.flip()
+
+    # FPS ayarı
+    clock.tick(60)
+
+pygame.quit()
+sys.exit()
